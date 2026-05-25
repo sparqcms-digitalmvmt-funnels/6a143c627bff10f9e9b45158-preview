@@ -1,0 +1,783 @@
+<!DOCTYPE html><html lang="en"><head><base href="/6a143c627bff10f9e9b45158-preview/"><meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="description" content=""><title>thank-you</title><link rel="icon" href="favicon.ico" type="image/x-icon"><script>
+sessionStorage.setItem("test", true);
+
+const ALLOWED_AFFILIATE_IDS = [];
+
+let nextPageSlug = null;
+
+function handleUrlParams(params) {
+  const specialParams = ["p_dc", "p_tenbucksoff", "p_freeship", "p_freegift"];
+  const allowedDcValues = ["5", "10", "15", "20", "25"];
+  const currentAffId = params.get("affid") || sessionStorage.getItem("affid");
+  const discountsAllowed =
+    ALLOWED_AFFILIATE_IDS.length === 0 ||
+    (currentAffId !== null && ALLOWED_AFFILIATE_IDS.includes(currentAffId));
+  if (!discountsAllowed) {
+    specialParams.forEach((key) => sessionStorage.removeItem(key));
+  }
+  params.forEach((value, key) => {
+    const paramKey = `p_${key}`;
+    if (specialParams.includes(paramKey)) {
+      if (!discountsAllowed) return;
+      if (paramKey === "p_dc" && !allowedDcValues.includes(value)) return;
+      sessionStorage.setItem(paramKey, value);
+    } else {
+      sessionStorage.setItem(key, value);
+    }
+  });
+}
+
+if (localStorage.getItem('sK_r')) {
+  const cr = JSON.parse(localStorage.getItem('sK_r'));
+  const normalizePath = (rawPath) => {
+    if (!rawPath) return '';
+    try {
+      let p = String(rawPath);
+      p = p.split('?')[0].split('#')[0];
+      p = p.replace(/\/+$/, '');
+      p = p.replace(/\/index.html$/, '');
+      p = p.replace(/^\/+/, ''); p = p.replace(/^6a143c627bff10f9e9b45158-preview\/?/, '');
+      return p;
+    } catch (e) {
+      console.error('Error normalizing path', e);
+      return '';
+    }
+  };
+  const pathname = window.location.pathname;
+  const cp = normalizePath(pathname || '/');
+  let nr = cr.find((r) => r.page === cp);
+  if (nr) {
+    const urlParams = new URLSearchParams(window.location.search);
+    const baseNext = pathname.endsWith("/index.html") ? nr.next + "/index.html" : nr.next || '';
+    const withQuery = urlParams && urlParams.toString()
+      ? baseNext + '?' + urlParams.toString()
+      : baseNext;
+    nextPageSlug = withQuery && !withQuery.startsWith('/') ? '/6a143c627bff10f9e9b45158-preview/' + withQuery : withQuery;
+
+    document.addEventListener("DOMContentLoaded", () => {
+      MVMT.init('6a143c627bff10f9e9b45158')
+      const ctaButtons = document.querySelectorAll("[data-cta-button]");
+      ctaButtons.forEach((button) => {
+        button.href = nextPageSlug;
+        button.addEventListener("click", (e) => {
+          e.preventDefault();
+          MVMT.track("CTA_CLICK", {
+            page: "thank-you",
+            page_type: "ThankYou",
+            page_url: window.location.href,
+          });
+          window.location.href = nextPageSlug;
+        });
+      });
+    });
+  }
+  
+}
+
+const route = async () => {
+  if (localStorage.getItem('sK_r')) return JSON.parse(localStorage.getItem('sK_r'));
+  const sessionId = MVMT.getSessionId() || localStorage.getItem("mvmt_session_id") || "";
+  const url = 'https://func-ab-test-events-staging-001.azurewebsites.net/api/checkRoute?id=6a143c627bff10f9e9b45158&v=177971251026342&sessionId='+sessionId;
+  try {
+    const response = await fetch(url);
+    if (!response.ok) throw new Error('Network response was not ok');
+    const data = await response.json();
+    localStorage.setItem('sK_r', JSON.stringify(data));
+    return data;
+  } catch (error) {
+    console.error('There was a problem with the fetch operation:', error);
+    throw error;
+  }
+}
+const nextPage = async () => {
+  let cr = await route();
+  if (!cr) throw new Error('Route not found');
+  const normalizePath = (rawPath) => {
+    if (!rawPath) return '';
+    try {
+      let p = String(rawPath);
+      p = p.split('?')[0].split('#')[0];
+      p = p.replace(/\/+$/, '');
+      p = p.replace(/\/index.html$/, '');
+      p = p.replace(/^\/+/, ''); p = p.replace(/^6a143c627bff10f9e9b45158-preview\/?/, '');
+      return p;
+    } catch (e) {
+      console.error('Error normalizing path', e);
+      return '';
+    }
+  };
+  const pathname = window.location.pathname;
+  const cp = normalizePath(pathname || '/');
+  let nr = cr.find((r) => r.page === cp);
+  if (!nr) {
+    try {
+      localStorage.removeItem('sK_r');
+    } catch (e) {
+      // ignore storage errors
+    }
+    cr = await route();
+    if (!cr) return '';
+    nr = cr.find((r) => r.page === cp);
+  }
+  const urlParams = new URLSearchParams(window.location.search);
+  if (!nr) return '';
+  const baseNext = pathname.endsWith("/index.html") ? nr.next + "/index.html" : nr.next || '';
+  const withQuery = urlParams && urlParams.toString()
+    ? baseNext + '?' + urlParams.toString()
+    : baseNext;
+  const absolute = withQuery && !withQuery.startsWith('/') ? '/6a143c627bff10f9e9b45158-preview/' + withQuery : withQuery;
+  return absolute;
+}
+const urlParams = new URLSearchParams(window.location.search);
+handleUrlParams(urlParams);
+
+document.addEventListener("DOMContentLoaded", () => {
+  document.addEventListener("click", (event) => {
+    const elementClasses = event.target.className;
+    const elementId = event.target.id;
+
+    const windowPosition = window.scrollY;
+    const windowWidth = window.innerWidth;
+    const windowHeight = window.innerHeight;
+    const elementPosition = event.clientX;
+    const elementTop = event.clientY;
+
+    MVMT.track("PAGE_CLICK", {
+      page: "thank-you",
+      page_type: "ThankYou",
+      page_url: window.location.href,
+      element_classes: elementClasses,
+      element_id: elementId,
+      window_position: windowPosition,
+      window_width: windowWidth,
+      window_height: windowHeight,
+      element_position: elementPosition,
+      element_top: elementTop,
+    });
+  });
+
+  const params = new URLSearchParams(window.location.search);
+  const elementsToHideSelectors = Array.from(params.entries()).reduce((selectors, [key, value]) => {
+      if (value === "n" || value === "none") {
+          selectors.push(`[data-url-param-${key}]`);
+      }
+      return selectors;
+  }, []);
+  if (elementsToHideSelectors.length) {
+      document.querySelectorAll(elementsToHideSelectors.join(",")).forEach(el => el.style.display = "none");
+  }
+  const topBanner = document.querySelector("[data-url-param-colorbanner]");
+  if (topBanner && params.has("colorbanner")) topBanner.style.backgroundColor = params.get("colorbanner") || "red";
+});
+
+const getGlobals = async () => {
+  const response = await fetch("https://stdigitalmvmtstaging001.blob.core.windows.net/globals/staging/default");
+  const data = await response.json();
+  return data;
+};
+
+document.addEventListener("DOMContentLoaded", async() => {
+
+  if (nextPageSlug === null || nextPageSlug.length === 0) {
+    nextPageSlug = await nextPage();
+    const ctaButtons = document.querySelectorAll("[data-cta-button]");
+    ctaButtons.forEach((button) => {
+      button.href = nextPageSlug;
+      button.addEventListener("click", (e) => {
+        e.preventDefault();
+        MVMT.track("CTA_CLICK", {
+          page: "thank-you",
+          page_type: "ThankYou",
+          page_url: window.location.href,
+        });
+        window.location.href = nextPageSlug;
+      });
+    });
+  }
+    
+  const globals = await getGlobals();
+  const globalAttribute = "data-holder-global"
+  const globalElements = document.querySelectorAll(`[${globalAttribute}]`);
+  if (globalElements) {
+    globalElements.forEach((element) => {
+      const data = globals[element.getAttribute(globalAttribute)];
+      element.innerText = data.label;
+      if (data.type === "url") {
+        element.href = data.src;
+      }
+    })
+  }
+
+  // Track all elements with data-sparqcms-component-id on page view
+  const sparqcmsComponentElements = document.querySelectorAll("[data-sparqcms-component-id]");
+  const componentIds = [];
+  sparqcmsComponentElements.forEach(element => {
+    componentIds.push(element.getAttribute("data-sparqcms-component-id"));
+  });
+  
+  if (componentIds.length > 0) {
+      MVMT.track("PAGE_VIEW_COMPONENTS", {
+      page: "thank-you",
+      page_type: "ThankYou",
+      page_url: window.location.href,
+      component_ids: componentIds
+    });
+  }
+});
+  
+  </script>
+<script>
+  const offerName = 'Vi-Shift, Vi-Shift';
+  window.dataLayer = window.dataLayer || [];
+  window.dataLayer.push({
+    'event': 'pageView', 
+    'offer': 'Vi-Shift, Vi-Shift',
+    'customer_id':sessionStorage.getItem("customerId") || undefined,
+    'page':{
+      'type':'ThankYou',
+      'isReload':performance.getEntriesByType("navigation")[0].type === "reload",
+      'isExclude':false
+    },
+    'experiment':{
+      'id':undefined,
+      'name':undefined,
+      'variation':undefined
+    }
+  });
+</script>
+  <script async src="https://static.klaviyo.com/onsite/js/klaviyo.js?company_id=XdCWtk"></script><link rel="stylesheet" href="styles/thank-you.css" /><link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin><link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Poppins:ital,wght@0,100;0,200;0,300;0,400;0,500;0,600;0,700;0,800;0,900;1,100;1,200;1,300;1,400;1,500;1,600;1,700;1,800;1,900&display=swap"><style>@layer imported{.border-b-10 {
+  border-bottom-right-radius: 10px;
+  border-bottom-left-radius: 10px;
+}}</style><style>@layer imported{.editable-on {
+  border: 1px solid #000;
+  border-radius: 4px;
+  padding: 0px 4px 0px 4px;
+  background-color: white;
+  width: 100%;
+  text-align: start;
+}
+
+.submit-address:disabled {
+  background-color: rgba(100, 210, 100, 0.75) !important;
+}}</style><script>(function () {
+  var CLASS = 'is-preloading-page';
+  var SELECTOR = '[data-preloader]';
+  function createLoader() {
+    if (document.querySelector(SELECTOR)) return;
+    var style = document.createElement('style');
+    style.textContent = [
+      'html.is-preloading-page { overflow: hidden !important; }',
+      'html.is-preloading-page body { visibility: hidden !important; }',
+      '[data-preloader] { position: fixed !important; inset: 0 !important; background: #fff !important; display: flex; align-items: center; justify-content: center; z-index: 999999999 !important; }',
+      '[data-preloader] .loader { width: 48px; height: 48px; border: 5px solid #124c75; border-bottom-color: transparent; border-radius: 50%; animation: spin 1s linear infinite; }',
+      '@keyframes spin { to { transform: rotate(360deg); } }'
+    ].join(' ');
+    document.head.appendChild(style);
+    var loader = document.createElement('div');
+    loader.setAttribute('data-preloader', '');
+    loader.setAttribute('data-testid', 'page-preloader');
+    loader.innerHTML = '<div class="loader" data-testid="page-preloader-spinner"></div>';
+    document.documentElement.appendChild(loader);
+  }
+  createLoader();
+  document.documentElement.classList.add(CLASS);
+  var failSafeTimer = setTimeout(function () {
+    if (window.__hidePreloader) window.__hidePreloader();
+  }, 8000);
+  function onError() {
+    clearTimeout(failSafeTimer);
+    if (window.__hidePreloader) window.__hidePreloader();
+  }
+  window.addEventListener('error', onError, { once: true });
+  window.addEventListener('unhandledrejection', onError, { once: true });
+  window.__hidePreloader = function () {
+    clearTimeout(failSafeTimer);
+    window.removeEventListener('error', onError);
+    window.removeEventListener('unhandledrejection', onError);
+    var el = document.querySelector(SELECTOR);
+    if (!el) {
+      document.documentElement.classList.remove(CLASS);
+      return;
+    }
+    el.style.transition = 'opacity 0.25s ease';
+    requestAnimationFrame(function () {
+      el.style.opacity = '0';
+    });
+    setTimeout(function () {
+      el.remove();
+      document.documentElement.classList.remove(CLASS);
+    }, 250);
+  };
+})();</script></head><body><div><div data-sparqcms-component-id="198a9149d9c5a50ecddfd48"><div class="c-lc9846 c-oaxxat c-rri4mx cxpk1f6 c7l9c6s c-a4oera"><img src="assets/rival-dark-logo.png" alt="Image header" class="c-hi7sxz cjmgjye c-d7jzl0" id="1" loading="lazy"/></div><div class="c-lc9846 c-oaxxat c-rri4mx cxpk1f6 c7l9c6s c-kpj72t c-aop3ja c-b1u9qq c-w48v6p c7g0fd5"><div class="c-lc9846 c-oaxxat c-rri4mx cxpk1f6 c7l9c6s c-3n63zq c46dcou ch4am80 ct12nrm c-ymnxj c1vbd6p"><div class="c-lc9846 c-oaxxat c-rri4mx cevei02 c7l9c6s c-kpkcet c5ebccj c-6s5fkd c1kzpo2 c-1vttgr c6un93a"><img src="assets/check-circle.svg" alt="Image header" class="c-i95srp civik4o c-d7jzl0 cgevsei c-aop3ja c-rp8xgd cw8coar ckrmxfc c-m14o2a" id="1" loading="lazy"/><span class="c-n92bdn c-m8oog cybkfeg cey0ojg c-jp5aks c8cprm cx26kob"><div bis_skin_checked="1">Thank you! Your order has been placed.</div></span></div><div class="c-lc9846 c-cvr7xx c-rri4mx cxpk1f6 c7l9c6s c-3n63zq c-46t6vk c-chr53o cun148d cck0jdd cnvgvs5"><span class="c-n92bdn c-d8btpc cey0ojg">Your order numbers are:&nbsp;</span><span class="c-n92bdn ciotczh cey0ojg cybjsex" data-holder="order_number">Order Number</span></div><span class="cmyac1f cey0ojg"><div style="text-align: left;" bis_skin_checked="1"><font face="Roboto, sans-serif">Your order numbers are . We will pack your order and ship it to you right away.<br>You will receive an email confirmation shortly at . Please print this page for your records.</font></div></span></div></div><div class="c-lc9846 c-oaxxat c-rri4mx cxpk1f6 c7l9c6s c-3df26e c-aop3ja c-b1u9qq co6tonp c-w48v6p c7g0fd5"><div class="c-lc9846 c-oaxxat c-rri4mx cxpk1f6 c7l9c6s c-a4oera c7e7cj7 c-1vttgr"><span class="c-n92bdn cybkfeg cnoqxzi c-6ddj7h c-lkia1r c3rgcpz cgpdm95 c-jp6kju">Please double check your shipping address in the details below. If you find an error, you can edit it by clicking the “edit shipping address” button below. Invalid addresses will cause shipping delays.</span><div class="c-lc9846 c-oaxxat c-rri4mx cxpk1f6 c7l9c6s c-a4oera c-lkia1r c3rgcpz c-aop3ja c-b1u9qq c-crbsvi ctduf03 c7e7cj7"><div class="c-lc9846 c-oaxxat c-rri4mx cxpk1f6 c7l9c6s c-a4oera c-46t6vk c-aop3ja c-b1u9qq c-crbsvi ctduf03" data-upsell-container="" data-product-quantity="3"><div class="c-lc9846 c-oaxxat c-rri4mx cxpk1f6 c7l9c6s c-a4oera c3rgcpz cnwhx0r ccl1klz cuo25gz c-cgq3v2 cz02kxo c-rp8xgd c7e7cj7 ctv37rh cj3w785 c2u3uy8 c-lywupb c-drxck4 cfndssc c-hz0ilw relative"><img src="assets/thankyou-bg.jpg" class="c-i9vfpo ciusx6p c-d7jzl0 c-9sljs7 ctfmc74 cr8hj72 c5g3h4d cr85fkb cq10fwz" loading="lazy"/><div class="c-lc9846 c-oaxxat c-rri4mx cevei02 c7l9c6s c-3n63zq cb447zj c-i9vfpo c-aop3ja c-b1u9qq c-crbsvi ctduf03 c-4au6wl cr8hj7x c7e7cj7 c-7hadx2"><img src="assets/Vector%20(3).png" alt="Image header" class="c-i955s6 civj747 c-d7jzl0" id="1" loading="lazy"/><span class="cmyac1f cybjsex c-lsq09 cey0ojg c-jp40lq">Important: Limited Time Offer</span></div><div class="c-lc9846 c-cvr7xx c-rri4mx cxpk1f6 c7l9c6s c-3n63zq c-46t6vk c-kfumxj c-828xdm c-aop3ja c-b1u9qq c-crbsvi ctduf03"><span class="c-n92bdn c-d8btpc cey0ojg">Our manufacturer just told us that we have one final shipment coming in with more Rival Footwears and wanted you, as a new customer, to be the first to have the opportunity to get more. Now you can get the RIVAL Shoe Inventory 3x EXTRA's Special, where you get an additional THREE Rival Footwears for just&nbsp; $</span><span class="c-n92bdn c-d8btpc cey0ojg" data-holder="product_final_price">19.99</span><span class="c-n92bdn c-d8btpc cey0ojg">&nbsp;with FREE SHIPPING.</span></div><div class="c-lc9846 c-oaxxat c-rri4mx cevei02 c7l9c6s c-3n63zq c-i9vfpo c-aolwln c-b1u9qq c-crbsvi ctduf03 c-hou3zo cruql2s c-4au6wl cr8hj7x c7e7cj7 cxds8az" data-variant-selector=""><span class="c-n92bdn c-rp8xgd c-aop3ja c-4au6wl cpqk4y4 cey0ojg c-jp4nl9">Pair 1</span><div class="c-lc9846 c-oaxxat c-rri4mx cevei02 c7l9c6s c-3n63zq c-aop3ja c-b1u9qq c-crbsvi ctduf03 c-iwz9f5 cruql2s c-hou3zo c8pped"><div class="c-lc9846 c-oaxxat c-rri4mx cxpk1f6 c-5pdfmv c-3n63zq c-aop3ja c-b1u9qq c-crbsvi ctduf03 c-ix2af8 cz02kxo c8n7oc"><span class="cey0ojg c-jp5xkb">Color</span><select class="c-i9vfpo c-u6bap8 c-pzcuxk cuo370x c-cgp2b4 c-mb61ox c-63hydz cf4pxvt ciwk8ct" data-variant=""><option
+            value="white"
+            key="white"
+            false
+          >
+            White
+          </option>,<option
+            value="black"
+            key="black"
+            false
+          >
+            Black
+          </option></select></div><div class="c-lc9846 c-oaxxat c-rri4mx cxpk1f6 c-5pdfmv c-3n63zq c-aop3ja c-b1u9qq c-crbsvi ctduf03 c-ix2af8 c8n7oc"><span class="c-n92bdn cey0ojg c-jp5xkb">Size</span><select class="c-i9vfpo c-u6bap8 c-pzcuxk cuo370x c-cgp2b4 c-mb61ox c-63hydz cf4pxvt ciwk8ct" data-variant=""><option
+            value="women7"
+            key="women7"
+            false
+          >
+            Women 7
+          </option>,<option
+            value="men6"
+            key="men6"
+            false
+          >
+            Men 6
+          </option>,<option
+            value="women7.5"
+            key="women7.5"
+            false
+          >
+            Women 7.5
+          </option>,<option
+            value="men6.5"
+            key="men6.5"
+            false
+          >
+            Men 6.5
+          </option>,<option
+            value="women8.5"
+            key="women8.5"
+            false
+          >
+            Women 8.5
+          </option>,<option
+            value="men7.5"
+            key="men7.5"
+            false
+          >
+            Men 7.5
+          </option>,<option
+            value="women9"
+            key="women9"
+            false
+          >
+            Women 9
+          </option>,<option
+            value="men8"
+            key="men8"
+            false
+          >
+            Men 8
+          </option>,<option
+            value="women9.5"
+            key="women9.5"
+            false
+          >
+            Women 9.5
+          </option>,<option
+            value="men8.5"
+            key="men8.5"
+            false
+          >
+            Men 8.5
+          </option>,<option
+            value="women10.5"
+            key="women10.5"
+            false
+          >
+            Women 10.5
+          </option>,<option
+            value="men9.5"
+            key="men9.5"
+            false
+          >
+            Men 9.5
+          </option>,<option
+            value="women11"
+            key="women11"
+            false
+          >
+            Women 11
+          </option>,<option
+            value="men10"
+            key="men10"
+            false
+          >
+            Men 10
+          </option>,<option
+            value="women11.5"
+            key="women11.5"
+            false
+          >
+            Women 11.5
+          </option>,<option
+            value="men10.5"
+            key="men10.5"
+            false
+          >
+            Men 10.5
+          </option>,<option
+            value="women12"
+            key="women12"
+            false
+          >
+            Women 12
+          </option>,<option
+            value="men11.5"
+            key="men11.5"
+            false
+          >
+            Men 11.5
+          </option>,<option
+            value="women14"
+            key="women14"
+            false
+          >
+            Women14
+          </option>,<option
+            value="men12"
+            key="men12"
+            false
+          >
+            Men 12
+          </option></select></div></div></div><div class="c-lc9846 c-oaxxat c-rri4mx cevei02 c7l9c6s c-3n63zq c-aolwln c-b1u9qq c-crbsvi ctduf03 c-i9vfpo cruql2s c-hou3zo c-4au6wl cr8hj7x" data-variant-selector=""><span class="c-n92bdn c-4au6wl cgjbud2 cey0ojg c-jp4nl9">Pair 2</span><div class="c-lc9846 c-oaxxat c-rri4mx cevei02 c7l9c6s c-3n63zq c-iwz9f5 c-aop3ja c-b1u9qq c-crbsvi ctduf03 c-hou3zo c8pped"><div class="c-lc9846 c-oaxxat c-rri4mx cxpk1f6 c-5pdfmv c-3n63zq c-ix2af8 c-aop3ja c-b1u9qq c-crbsvi ctduf03"><span class="c-n92bdn cey0ojg c-jp5xkb">Color</span><select class="c-i9vfpo c-u6bap8 c-pzcuxk cuo370x c-cgp2b4 c-mb61ox c-63hydz cf4pxvt" data-variant=""><option
+            value="white"
+            key="white"
+            false
+          >
+            White
+          </option>,<option
+            value="black"
+            key="black"
+            false
+          >
+            Black
+          </option></select></div><div class="c-lc9846 c-oaxxat c-rri4mx cxpk1f6 c-5pdfmv c-3n63zq c-aop3ja c-b1u9qq c-crbsvi ctduf03 c-ix2af8"><span class="c-n92bdn cey0ojg c-jp5xkb">Size</span><select class="c-i9vfpo c-u6bap8 c-pzcuxk cuo370x c-cgp2b4 c-mb61ox c-63hydz cf4pxvt ciwk8ct" data-variant=""><option
+            value="women7"
+            key="women7"
+            false
+          >
+            Women 7
+          </option>,<option
+            value="men6"
+            key="men6"
+            false
+          >
+            Men 6
+          </option>,<option
+            value="women7.5"
+            key="women7.5"
+            false
+          >
+            Women 7.5
+          </option>,<option
+            value="men6.5"
+            key="men6.5"
+            false
+          >
+            Men 6.5
+          </option>,<option
+            value="women8.5"
+            key="women8.5"
+            false
+          >
+            Women 8.5
+          </option>,<option
+            value="men7.5"
+            key="men7.5"
+            false
+          >
+            Men 7.5
+          </option>,<option
+            value="women9"
+            key="women9"
+            false
+          >
+            Women 9
+          </option>,<option
+            value="men8"
+            key="men8"
+            false
+          >
+            Men 8
+          </option>,<option
+            value="women9.5"
+            key="women9.5"
+            false
+          >
+            Women 9.5
+          </option>,<option
+            value="men8.5"
+            key="men8.5"
+            false
+          >
+            Men 8.5
+          </option>,<option
+            value="women10.5"
+            key="women10.5"
+            false
+          >
+            Women 10.5
+          </option>,<option
+            value="men9.5"
+            key="men9.5"
+            false
+          >
+            Men 9.5
+          </option>,<option
+            value="women11"
+            key="women11"
+            false
+          >
+            Women 11
+          </option>,<option
+            value="men10"
+            key="men10"
+            false
+          >
+            Men 10
+          </option>,<option
+            value="women11.5"
+            key="women11.5"
+            false
+          >
+            Women 11.5
+          </option>,<option
+            value="men10.5"
+            key="men10.5"
+            false
+          >
+            Men 10.5
+          </option>,<option
+            value="women12"
+            key="women12"
+            false
+          >
+            Women 12
+          </option>,<option
+            value="men11.5"
+            key="men11.5"
+            false
+          >
+            Men 11.5
+          </option>,<option
+            value="women14"
+            key="women14"
+            false
+          >
+            Women14
+          </option>,<option
+            value="men12"
+            key="men12"
+            false
+          >
+            Men 12
+          </option></select></div></div></div><div class="c-lc9846 c-oaxxat c-rri4mx cevei02 c7l9c6s c-3n63vf c-aolwln c-b1u9qq c-crbsvi ctduf03 c-i9vfpo c-hou3zo c-4au6wl cr8hj7x" data-variant-selector=""><span class="c-n92bdn c-4au6wl cgjbud2 cey0ojg c-jp4nl9">Pair 3</span><div class="c-lc9846 c-oaxxat c-rri4mx cevei02 c7l9c6s c-3n63zq c-iwz9f5 c-hou3zo c-aop3ja c-b1u9qq c-crbsvi ctduf03 c8pped"><div class="c-lc9846 c-oaxxat c-rri4mx cxpk1f6 c-5pdfmv c-3n63zq c-aop3ja c-b1u9qq c-crbsvi ctduf03 c-ix2af8"><span class="c-n92bdn cey0ojg c-jp5xkb">Color</span><select class="c-i9vfpo c-u6bap8 c-pzcuxk cuo370x c-cgp2b4 c-mb61ox c-63hydz cf4pxvt" data-variant=""><option
+            value="white"
+            key="white"
+            false
+          >
+            White
+          </option>,<option
+            value="black"
+            key="black"
+            false
+          >
+            Black
+          </option></select></div><div class="c-lc9846 c-oaxxat c-rri4mx cxpk1f6 c-5pdfmv c-3n63zq c-ix2af8 c-aop3ja c-b1u9qq c-crbsvi ctduf03"><span class="c-n92bdn cey0ojg c-jp5xkb">Size</span><select class="c-i9vfpo c-u6bap8 c-pzcuxk cuo370x c-cgp2b4 c-mb61ox c-63hydz cf4pxvt ciwk8ct" data-variant=""><option
+            value="women7"
+            key="women7"
+            false
+          >
+            Women 7
+          </option>,<option
+            value="men6"
+            key="men6"
+            false
+          >
+            Men 6
+          </option>,<option
+            value="women7.5"
+            key="women7.5"
+            false
+          >
+            Women 7.5
+          </option>,<option
+            value="men6.5"
+            key="men6.5"
+            false
+          >
+            Men 6.5
+          </option>,<option
+            value="women8.5"
+            key="women8.5"
+            false
+          >
+            Women 8.5
+          </option>,<option
+            value="men7.5"
+            key="men7.5"
+            false
+          >
+            Men 7.5
+          </option>,<option
+            value="women9"
+            key="women9"
+            false
+          >
+            Women 9
+          </option>,<option
+            value="men8"
+            key="men8"
+            false
+          >
+            Men 8
+          </option>,<option
+            value="women9.5"
+            key="women9.5"
+            false
+          >
+            Women 9.5
+          </option>,<option
+            value="men8.5"
+            key="men8.5"
+            false
+          >
+            Men 8.5
+          </option>,<option
+            value="women10.5"
+            key="women10.5"
+            false
+          >
+            Women 10.5
+          </option>,<option
+            value="men9.5"
+            key="men9.5"
+            false
+          >
+            Men 9.5
+          </option>,<option
+            value="women11"
+            key="women11"
+            false
+          >
+            Women 11
+          </option>,<option
+            value="men10"
+            key="men10"
+            false
+          >
+            Men 10
+          </option>,<option
+            value="women11.5"
+            key="women11.5"
+            false
+          >
+            Women 11.5
+          </option>,<option
+            value="men10.5"
+            key="men10.5"
+            false
+          >
+            Men 10.5
+          </option>,<option
+            value="women12"
+            key="women12"
+            false
+          >
+            Women 12
+          </option>,<option
+            value="men11.5"
+            key="men11.5"
+            false
+          >
+            Men 11.5
+          </option>,<option
+            value="women14"
+            key="women14"
+            false
+          >
+            Women14
+          </option>,<option
+            value="men12"
+            key="men12"
+            false
+          >
+            Men 12
+          </option></select></div></div></div><img src="assets/thankyou-bg.jpg" width="576" height="232" alt="" style='position:absolute;top:0;left:0;width:100%;height:100%;object-fit:cover;z-index:-1;' loading="eager" /></div><a class="border-b-10 c-lc9846 c-oaxxat c-rri4mx cxpk1f6 c7l9c6s c-ty92ka c-i9vfpo c-sl9bnn c-kfumxj cr8hj72 c5g3h4d c-z81ct c7e7cj7 c1dtcuj cpwhmpd c-drxck4 c-hz0imr c-xbv65t c-w9u8xv c-4aoy6u" data-submit-button=""><span class="c-n92bdn cybkfeg c-msh9t">Claim Now</span></a></div></div><div class="c-lc9846 c-oaxxat c-rri4mx cxpk1f6 c7l9c6s c-535r6p c-mb5epe c-bq0yik cwtaoij c-evftdq c-aop3ja c3rgcpz cgpdm95"><span class="c-n92bdn cyblpdi"><br></span><div class="c-lc9846 c-oaxxat c-rri4mx cevei02 c-5pdfmv c-535r6p c-k1hfkf c-1vttgr"><img src="assets/ups-nw2.png" alt="Image header" class="c-i5zi48 cixl9lf c-d7jzl0 c-aop3ja c-6dxbsu" id="1" loading="lazy"/><span class="cmyac1f c-mh0s78 c-6dxbsu c-ll22n4 cg1g8ho cw88udl c36k669 cg8zmdh c-jp5aks">This is an American-owned business that doesn't believe it should take 45 days to receive your product from China. <br>Orders are sent from our New Jersey warehouse via USPS,&nbsp;FedEx, UPS, or DHL for international customers depending on speed and efficiency of delivery. Product will be shipped&nbsp;within 48 business hours. Please allow between 5-7 days for standard delivery. You will be emailed a tracking link after your order is shipped. Thank you for your purchase!</span></div></div><div class="c-lc9846 c-oaxxat c-rri4mx cxpk1f6 c-5pdfmv c-a4oera cgq2iqq c-xempt3 c-kixfe9 c-6s5fkd c1kzpo2 c-t3b5ha"><span class="c-n92bdn cybjsex cjtjl7g c-jp5aks">ORDER DETAILS</span><div class="c-lc9846 c-oaxxat c-rri4mx cevei02 c7l9c6s c-a4oera c-hou3zo c3rgcpz c-crbsvi ctduf03 cgpdm95"><span class="c-n92bdn c-msh9t cybj5fe c69iwd8 c-jp5aks">Order Date</span><span class="c-n92bdn c69iwd8 cybjsex c-msh9t c-jp5aks" data-holder="order_date">03-13-2025</span></div><div class="c-lc9846 c-oaxxat c-rri4mx cevei02 c7l9c6s c-a4oera c3rgcpz c-hou3zo c-crbsvi ctduf03 cgpdm95"><span class="c-n92bdn c-msh9t cybj5fe c69iwd8 c-jp5aks">Order Total</span><span class="c-n92bdn c69iwd8 cybjsex c-msh9t c-jp5aks" data-holder="total_excl_tax">$0.00</span></div><div class="c-lc9846 c-oaxxat c-rri4mx cevei02 c-5pdfmv c-a4oera c3rgcpz c-hou3zo c-crbsvi ctduf03 cgqh7fv c-k1hfkf c-y3zxyn"><form class="c-lc9846 c-oaxxat c-rri4mx cxpk1f6 c-5pdfmv c-zfi062 c-ix2b5x ciusx6p c7e7cj7 cdpswkc c-flilpm" data-address-form=""><span class="c-n92bdn cybjsex cjtjl7g c-oaxxat"><div bis_skin_checked="1">SHIPPING ADDRESS</div></span><div class="c-lc9846 c-oaxxat c-rri4mx cxpk1f6 c-5pdfmv c-3n63zq c-crbsvi c-b1u9qq cnuyd5u c-i9vfpo"><span class="c-n92bdn c-mvo7g">First Name</span><span class="cmyac1f cybj5fe c-i9vfpo" data-first-name="" data-content-editable="">first_name</span></div><div class="c-lc9846 c-oaxxat c-rri4mx cxpk1f6 c-5pdfmv c-3n63zq c-crbsvi c-b1u9qq cnuyd5u c-i9vfpo"><span class="c-n92bdn c-mvo7g">Last Name</span><span class="cmyac1f cybj5fe" data-last-name="" data-content-editable="">last_name</span></div><div class="c-lc9846 c-oaxxat c-rri4mx cxpk1f6 c-5pdfmv c-3n63zq c-crbsvi c-b1u9qq cnuyd5u c-i9vfpo"><span class="c-n92bdn c-mvo7g">Address</span><span class="cmyac1f cybj5fe" data-line-1="" data-content-editable="">adress_line_1</span></div><div class="c-lc9846 c-oaxxat c-rri4mx cxpk1f6 c-5pdfmv c-3n63zq c-crbsvi c-b1u9qq cnuyd5u c-i9vfpo"><span class="c-n92bdn c-mvo7g">Address</span><span class="cmyac1f cybj5fe" data-line-2="" data-content-editable="">adress_line_2</span></div><div class="c-lc9846 c-oaxxat c-rri4mx cxpk1f6 c-5pdfmv c-3n63zq c-crbsvi c-b1u9qq cnuyd5u c-i9vfpo"><span class="c-n92bdn c-mvo7g">City</span><span class="cmyac1f cybj5fe" data-city="" data-content-editable="">city</span></div><div class="c-lc9846 c-oaxxat c-rri4mx cxpk1f6 c-5pdfmv c-3n63zq c-crbsvi c-b1u9qq cnuyd5u c-i9vfpo cmyac1f"><span class="c-n92bdn c-mvo7g">State</span><span class="c-n92bdn cybj5fe" data-select-states="" data-content-editable="">state</span></div><div class="c-lc9846 c-oaxxat c-rri4mx cxpk1f6 c-5pdfmv c-3n63zq c-crbsvi c-b1u9qq cnuyd5u c-i9vfpo cmyac1f"><span class="c-n92bdn c-mvo7g">Country</span><span class="cmyac1f cybj5fe" data-select-countries="" data-content-editable="">country</span></div><div class="c-lc9846 c-oaxxat c-rri4mx cxpk1f6 c-5pdfmv c-3n63zq c-crbsvi c-b1u9qq cnuyd5u c-iwz3hl cmyac1f"><span class="c-n92bdn c-mvo7g">Zip Code</span><span class="c-n92bdn cybj5fe" data-zip-code="" data-content-editable="">zip_code</span></div><div class="c-lc9846 c-oaxxat c-rri4mx cevei02 c7l9c6s c-3n63zq c-crbsvi ctduf03 c-hou3zo c-mxl61 c-i9vfpo cvg4iv8"><button class="c-lc9846 c-oaxxat cxpk1f6 c-rri4mx c-jnm9yf c-jaytv5 c-sc1q4l cuo370x c-cgp2b4 cgt2htg cwzv3pd cey0ojg c-63hydz cxyxii1 c-mb61ox" type="button" data-edit-address=""><span class="">Edit Shipping Address</span></button><button class="submit-address c-lc9846 c-oaxxat cxpk1f6 c-rri4mx cwxb8yv c-jaytv5 c-sc1q4l c-68524x c-ttwp4g cgt2htg cwzv3pd cey0ojg c-63hydz c-1od8hg c-mb61ox" type="submit" data-submit-address=""><span class="">Confirm</span></button></div></form><div class="c-lc9846 c-oaxxat c-rri4mx cxpk1f6 c-5pdfmv c-zfi062 c-ix2b5x ciusx6p ccn9sjd c7e7cj7 c-flilpm"><span class="c-n92bdn cybjsex cjtjl7g c-oaxxat"><div bis_skin_checked="1">BILLING ADDRESS</div></span><div class="c-lc9846 c-oaxxat c-rri4mx cxpk1f6 c-5pdfmv c-3n63zq c-crbsvi c-b1u9qq cnuyd5u"><span class="c-n92bdn c-mvo7g">First Name</span><span class="c-n92bdn cybj5fe" data-billing-first-name="data-billing-first-name">first_name</span></div><div class="c-lc9846 c-oaxxat c-rri4mx cxpk1f6 c-5pdfmv c-3n63zq c-crbsvi c-b1u9qq cnuyd5u"><span class="c-n92bdn c-mvo7g">Last Name</span><span class="c-n92bdn cybj5fe" data-billing-last-name="data-billing-last-name">last_name</span></div><div class="c-lc9846 c-oaxxat c-rri4mx cxpk1f6 c-5pdfmv c-3n63zq c-crbsvi c-b1u9qq cnuyd5u"><span class="c-n92bdn c-mvo7g">Address</span><span class="c-n92bdn cybj5fe" data-billing-line-1="">adress_line_1</span></div><div class="c-lc9846 c-oaxxat c-rri4mx cxpk1f6 c-5pdfmv c-3n63zq c-crbsvi c-b1u9qq cnuyd5u"><span class="c-n92bdn c-mvo7g">Address</span><span class="c-n92bdn cybj5fe" data-billing-line-2="">adress_line_2</span></div><div class="c-lc9846 c-oaxxat c-rri4mx cxpk1f6 c-5pdfmv c-3n63zq c-crbsvi c-b1u9qq cnuyd5u"><span class="c-n92bdn c-mvo7g">City</span><span class="c-n92bdn cybj5fe" data-billing-city="">city</span></div><div class="c-lc9846 c-oaxxat c-rri4mx cxpk1f6 c-5pdfmv c-3n63zq c-crbsvi c-b1u9qq cnuyd5u"><span class="c-n92bdn c-mvo7g">State</span><span class="c-n92bdn cybj5fe" data-billing-select-states="">state</span></div><div class="c-lc9846 c-oaxxat c-rri4mx cxpk1f6 c-5pdfmv c-3n63zq c-crbsvi c-b1u9qq cnuyd5u"><span class="c-n92bdn c-mvo7g">Country</span><span class="c-n92bdn cybj5fe" data-billing-select-countries="">country</span></div><div class="c-lc9846 c-oaxxat c-rri4mx cxpk1f6 c-5pdfmv c-3n63zq c-crbsvi c-b1u9qq cnuyd5u"><span class="c-n92bdn c-mvo7g">Zip Code</span><span class="c-n92bdn cybj5fe" data-billing-zip-code="">zip_code</span></div></div></div></div><div class="c-lc9846 c-oaxxat c-rri4mx cxpk1f6 c-5pdfmv c-a4oera"><span class="c-n92bdn cybjsex cjtjl7g c-jp5aks">ORDER SUMMARY</span><div class="c-lc9846 c-oaxxat c-rri4mx cxpk1f6 c7l9c6s c-a4oera c-46t6vk c-i9vfpo" data-order-summary-items=""></div><div class="c-lc9846 c-oaxxat c-rri4mx cevei02 c7l9c6s c-a4oera c3rgcpz c-hou3zo c-crbsvi ctduf03 cfvxcbd cjgm220 cgpdm95"><span class="c-n92bdn c-msh9t cybjsex c69iwd8 c-jp5aks"><span style="color: rgb(51, 51, 51); font-size: 18px;">Shipping</span></span><span class="c-n92bdn cybjsex c69iwd8 c-msh9t c-jp5aks" data-holder="shipping_excl_tax"><div bis_skin_checked="1">$0.00</div></span></div><div class="c-lc9846 c-oaxxat c-rri4mx cevei02 c7l9c6s c-a4oera c3rgcpz c-hou3zo c-crbsvi ctduf03 cgpdm95"><span class="c-n92bdn c-msh9t cybkfeg c-mh0s78 c-jp5aks"><span style="color: rgb(51, 51, 51); font-size: 18px;">Total</span></span><span class="c-n92bdn cybkfeg c-24djvn c-msh9t c-jp5aks" data-holder="total_incl_tax"><div bis_skin_checked="1">$0.00</div></span></div><span class="cmyac1f c3rgcpz c-mv17x c-mh0s78 cgpdm95">Charges on your statement will be processed for $0.00 and will appear as TACTICAL SUPPLY 8668090004.</span></div><div class="c-lc9846 c-oaxxat c-rri4mx cevei02 c-5pdfmv c-a4oera cwtaoij c-let0j3 c-k1hfkf cgql1d1 c-xi84yw c-32nkxw"><img src="assets/model.png" alt="Image header" class="c-i6i0qj ciy6c5u c-d7jzl0 cmrhdah c-aop3ja c-6ddj7h cesih2s co9kv5w c2rxbkb cm16ee6" id="1" loading="lazy"/><div class="c-lc9846 c-oaxxat c-rri4mx cxpk1f6 c-5pdfmv c-3n63zq c3aeqbs cgov3mu"><span class="c-n92bdn c-mb8mk cybkfeg cgn72v8 c8cprm c-jp2qmo"><div bis_skin_checked="1">We are here to help you.<br></div></span><span class="cmyac1f cgn6fvp c-jp5aks">If you have any questions or comments about your order or our products, you can reach us at +1 (888) 445-0641, we are available for you 24/7. You may also email us at support@rivalfootwear.com and one of our agents will get back to you within 24 hours.</span></div></div></div></div><div class="c-lc9846 c-oaxxat c-rri4mx cxpk1f6 c7l9c6s c-qf5jau c-aop3ja c-b1u9qq c-crbsvi ctduf03"><div class="c-lc9846 c-oaxxat c-rri4mx cevei02 c-5pdfmv c-qf5jau c-sx1vvb c-i9vfpo c-k1hfkf c-1vttgr c-x8zsop c-e4pwfg c-ohjtqh ckyhy7i c-2temw2 c7akzmo"><div class="c-lc9846 c-oaxxat c-rri4mx cxpk1f6 c-5pdfmv c-3n63zq c-1vttgr c-e4pwfg cm7ktim caeus9j"><span class="c-n92bdn c-mv17x cey0ojg c-mb6oog cel35e0 cfvwpbu cybkfeg">INFORMATION</span><span class="c-n92bdn cey0ojg">Referece</span><span class="c-n92bdn cey0ojg">Owner's Manual</span><span class="c-n92bdn cey0ojg">FAQs</span><span class="c-n92bdn cey0ojg">Contact Us</span><span class="c-n92bdn cey0ojg">Terms &amp; Conditions</span><span class="c-n92bdn cey0ojg">Privacy Policy</span><span class="c-n92bdn cey0ojg">Returns</span><span class="c-n92bdn cey0ojg">Shipping</span><span class="c-n92bdn cey0ojg">Warranty</span></div><div class="c-lc9846 c-oaxxat c-rri4mx cxpk1f6 c-5pdfmv c-3n63zq c-1vttgr cuhz3h5 cm7ktim caeus9j"><span class="c-n92bdn c-mv17x cey0ojg c-mb6oog cel35e0 cfvwpbu cybkfeg">PAYMENT METHODS</span><div class="c-lc9846 c-oaxxat c-rri4mx cevei02 c7l9c6s c-3n63zq cnx1hid cxd973x cx5rxpp"><img src="assets/visa-xpress-icon.png" class="c-i49st5 cjmgjye c-d7jzl0" loading="lazy"/></div></div><div class="c-lc9846 c-oaxxat c-rri4mx cxpk1f6 c-5pdfmv c-3n63zq c-ms9xf2 c-1vttgr c-e4pwfg caeus9j cm7ktim"><span class="c-n92bdn c-mv17x cey0ojg c-mb6oog cel35e0 cfvwpbu cybkfeg">GUARANTEE</span><span class="cmyac1f cey0ojg c1iqke0">We offer 30-Days money-back<br>guarantee</span></div><div class="c-lc9846 c-oaxxat c-rri4mx cxpk1f6 c-5pdfmv c-3n63zq caeus9j cm7ktim"><img src="assets/logo-white.webp" alt="Image header" class="c1rfazo cgalj93 c-d7jzl0 cv4ctcs c-3bdj99 c-vzpog" id="1" loading="lazy"/></div></div><div class="c-lc9846 c-oaxxat c-rri4mx cxpk1f6 c7l9c6s c-3n63zq c-iwza5u c-6g2fdr c-xwyqlc cnvd1uz cclk38a c-crbsvi ctduf03"><span class="c-n92bdn cey0ojg c-mwb6z"><div>&nbsp;2025 Copyright © Rival Footwear. All Rights Reserved.</div></span></div><div class="c-lc9846 c-o6hhdg c-rri4mx cxpk1f6 c-5pdfmv c-a4oera c-i86k2d cfxwihl cnby850 ciwhsh3 cr8hj7x corctar c-mb61ox c-v76y7t c-n92bdn c-ic30jh c-lbx363 c5g4gle c-468i9h cnkzvdv c-1vttgr c-y2u18x c8q8of c-6s13s8 c-w92kqn c-17s8oo cms8v4l c570edc cfr8k07 c9e0l6b c-wjyd2k cppen2d c-1sbp6k c52ugyh cokimws ctlu5ap" data-cookie-banner=""><span class="cybjsex c-b1u9qq cq10fwz c-i9vfpo c-mb8mk">We value your privacy</span><span class="c-mtr8v"><div>By clicking “Accept,” you agree to our Terms of Use and our Privacy Policy. Clicking “Accept” means you consent to the use of cookies and similar tracking technologies to, among other things, serve you relevant ads ourselves or through our third-party ad partners with whom data from cookies is shared</div></span><div class="c-lc9846 c-oaxxat c-rri4mx cevei02 c-a4oera cruvoz0 c-b1u9qq c-crbsvi c-aop3ja c-ch8uwh c-i9vfpo c-evftdq" data-cookie-btns=""><button class="c-lc9846 c-oaxxat cxpk1f6 c-rri4mx c-3n4ynq c-jaytv5 c-sc1q4l c-z1rj74 ccdkvsh c-2hf5cf cu8uuf8 cz02kxo c-63hydz c-tij0or c-mb4rpv c-evftdq" data-cookie-accept-button=""><span class="">Accept All</span></button><button class="c-lc9846 c-oaxxat cxpk1f6 c-rri4mx c1mdae7 c-jaytv5 c-sc1q4l ccdkvsh c-2hf5cf cu8uuf8 cey0ojg c-63hydz c-z1rj74 c-evftdq" data-cookie-reject-button=""><span class="">Reject All</span></button></div></div></div></div></div><script src="https://stdigitalmvmtstaging001.blob.core.windows.net/libs/mvmt-latest.staging.js.min.js"></script><script src="scripts/thank-you.js"></script><script src="https://unpkg.com/just-validate@latest/dist/just-validate.production.min.js"></script><script>document.addEventListener("DOMContentLoaded", (event) => {
+  const editableElements = [...document.querySelectorAll("[data-content-editable]")];
+  if (editableElements) {
+    const editBtn = document.querySelector("[data-edit-address]");
+    editBtn.addEventListener("click", () => {
+      if (editableElements.every(el => el.getAttribute("contenteditable") === "true")) {
+        editableElements.forEach((el) => {
+          el.setAttribute("contenteditable", false);
+          el.classList.remove("editable-on");
+        });
+      } else {
+        editableElements.forEach((el) => {
+          el.setAttribute("contenteditable", true);
+          el.classList.add("editable-on");
+        });
+        editableElements[0].focus();
+      }
+    });
+  }
+});</script>
+<script type="application/json" id="page-config">
+{
+  "campaignId": "39",
+  "pageType": "ThankYou",
+  "funnelId": "6a143c627bff10f9e9b45158",
+  "locale": "US"
+}
+</script>
+
+  <script>
+    document.addEventListener("DOMContentLoaded", () => {
+      setTimeout(() => {
+        const cookiesBanner = document.querySelector("[data-cookie-banner]");
+        const cookieAcceptButton = document.querySelector("[data-cookie-accept-button]");
+        const cookieRejectButton = document.querySelector("[data-cookie-reject-button]");
+
+        if (!(cookiesBanner && cookieAcceptButton && cookieRejectButton)) return;
+
+        const cookieDependentScripts = [];
+        const cookiesAnswer = sessionStorage.getItem("cookiesAnswer");
+
+        if (cookiesAnswer === "accepted" || cookiesAnswer === "rejected") {
+          cookiesBanner.style.display = "none";
+          injectTrackingScripts();
+        } else {
+          cookiesBanner.style.display = "flex";
+        }
+
+        cookieAcceptButton.addEventListener("click", () => {
+          sessionStorage.setItem("cookiesAnswer", "accepted");
+          cookiesBanner.style.display = "none";
+          if (cookieDependentScripts.length > 0) injectTrackingScripts()
+        });
+
+        cookieRejectButton.addEventListener("click", () => {
+          sessionStorage.setItem("cookiesAnswer", "rejected");
+          cookiesBanner.style.display = "none";
+        });
+
+        function injectTrackingScripts() {
+          cookieDependentScripts.forEach((script) => {
+            if (script.src) {
+              const scriptElement = document.createElement("script");
+              scriptElement.src = script.src;
+              scriptElement.async = true;
+              document.head.appendChild(scriptElement);
+            } else if (script.text) {
+              const scriptElement = document.createElement("script")
+              scriptElement.innerHTML = script.text;
+              document.head.appendChild(scriptElement);
+            }
+          })
+        }
+      }, 500);
+    });
+  </script>
+  </body></html>
